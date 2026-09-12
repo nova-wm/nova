@@ -32,6 +32,13 @@ pub struct LayerRule {
     pub output: String,
 }
 
+/// Canvas-only actions only make sense while the canvas layout is active.
+/// They must never shadow general-use binds (e.g. a bar's `mod+t toggle_pin`
+/// should not steal a user's `mod+t spawn`).
+pub(crate) fn is_canvas_keybind(action: &str) -> bool {
+    action == "toggle_pin" || action.starts_with("canvas_") || action.starts_with("canvas ")
+}
+
 /// One parsed keybinding from the `keybinds` config block.
 #[derive(Clone, Debug)]
 pub struct Keybind {
@@ -1146,12 +1153,24 @@ fn apply_document(config: &mut Config, doc: &KdlDocument) {
                         config.keybindings_from_file = true;
                     } else {
                         for kb in parsed {
-                            config.keybindings.retain(|existing| {
-                                existing.modifiers != kb.modifiers
-                                    || existing.key != kb.key
-                                    || existing.mouse_button != kb.mouse_button
-                            });
-                            config.keybindings.push(kb);
+                            let existing =
+                                config.keybindings.iter_mut().find(|existing| {
+                                    existing.modifiers == kb.modifiers
+                                        && existing.key == kb.key
+                                        && existing.mouse_button == kb.mouse_button
+                                });
+                            match existing {
+                                // A canvas-only bind only takes over a combo that
+                                // was already canvas-only; it never shadows a
+                                // general-use bind (keys.kdl keeps `mod+t spawn`)
+                                // while a `canvas_keys.kdl` `mod+t toggle_pin`
+                                // waits for the canvas layout.
+                                Some(current)
+                                    if is_canvas_keybind(&kb.action)
+                                        && !is_canvas_keybind(&current.action) => {}
+                                Some(current) => *current = kb,
+                                None => config.keybindings.push(kb),
+                            }
                         }
                     }
                 }
@@ -1377,6 +1396,27 @@ windowrule {
             "later keybinds blocks must not wipe earlier ones"
         );
         assert_eq!(watcher.config.scroll_speed, 400, "scroll settings must load from scroll.kdl");
+    }
+
+    #[test]
+    fn canvas_binds_do_not_shadow_general_binds() {
+        let mut config = Config::default();
+        let user: kdl::KdlDocument = "keybinds {\n    bind \"mod+t\" \"spawn brave\"\n}\n"
+            .parse()
+            .expect("user keybinds doc must parse");
+        let canvas: kdl::KdlDocument = "keybinds {\n    bind \"mod+t\" \"toggle_pin\"\n}\n"
+            .parse()
+            .expect("canvas keybinds doc must parse");
+        super::apply_document(&mut config, &user);
+        super::apply_document(&mut config, &canvas);
+
+        let t = config
+            .keybindings
+            .iter()
+            .find(|kb| kb.key == "t" && kb.modifiers == ["mod"])
+            .expect("mod+t must still exist");
+        assert_eq!(t.action, "spawn", "canvas toggle_pin must not shadow spawn brave");
+        assert_eq!(t.args, ["brave"]);
     }
 
     #[test]
