@@ -293,6 +293,20 @@ novactl stop                  # quit NovaWM
 
 ---
 
+## Troubleshooting
+
+### kitty is laggy / stutters when large
+
+By default kitty paces its render loop off the compositor's frame callbacks
+(`sync_to_monitor yes`). On some drivers that drops frames on big windows.
+Add this to `~/.config/kitty/kitty.conf`:
+
+```
+sync_to_monitor no
+```
+
+---
+
 ## What NovaWM is not
 
 NovaWM is intentionally **not** a full desktop environment. It is a compositor.
