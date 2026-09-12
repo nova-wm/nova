@@ -9,7 +9,6 @@ use smithay::{
             surface::{WaylandSurfaceRenderElement, WaylandSurfaceTexture},
         },
         gles::{GlesRenderer, GlesTexProgram, GlesTexture, Uniform},
-        multigpu::Error as MultiError,
         utils::{CommitCounter, DamageSet, OpaqueRegions},
     },
     output::Output,
@@ -538,9 +537,7 @@ impl<'a> RenderElement<super::UdevRenderer<'a>> for RoundedSurfaceElement {
 
         match self.inner.texture() {
             WaylandSurfaceTexture::Texture(texture) => {
-                let primary = frame
-                    .primary_frame()
-                    .ok_or(MultiError::DeviceMissing)?;
+                let primary = frame.as_mut();
 
                 let uniforms = [
                     Uniform::new("u_size", [self.region.size.w as f32, self.region.size.h as f32]),
@@ -678,9 +675,7 @@ impl<'a> RenderElement<super::UdevRenderer<'a>> for RoundedBorderElement {
                     });
             }
         }
-        let primary = frame
-            .primary_frame()
-            .ok_or(MultiError::DeviceMissing)?;
+        let primary = frame.as_mut();
 
         let radius = self
             .radius
@@ -770,9 +765,7 @@ impl<'a> RenderElement<super::UdevRenderer<'a>> for WallpaperElement {
         opaque_regions: &[Rectangle<i32, Physical>],
         _cache: Option<&UserDataMap>,
     ) -> Result<(), <super::UdevRenderer<'a> as RendererSuper>::Error> {
-        let primary = frame
-            .primary_frame()
-            .ok_or(MultiError::DeviceMissing)?;
+        let primary = frame.as_mut();
 
         Ok(primary.render_texture_from_to(
             &self.texture,
