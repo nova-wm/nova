@@ -10,11 +10,11 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc="Tiling Wayland compositor (scroll / dwindle / canvas)"
 arch=('x86_64' 'aarch64')
-url="https://github.com/Frqme21/NovaWM"
+url="https://github.com/nova-wm/nova"
 license=('AGPL-3.0')
 depends=(
   'gcc-libs' 'glibc' 'libxkbcommon' 'libinput' 'libdisplay-info'
-  'libseat' 'mesa' 'pixman' 'wayland' 'libpipewire' 'systemd-libs'
+  'seatd' 'mesa' 'pixman' 'wayland' 'libpipewire' 'systemd-libs'
 )
 optdepends=(
   'xdg-desktop-portal' 'xdg-desktop-portal-wlr' 'pipewire' 'wireplumber'
@@ -23,22 +23,20 @@ optdepends=(
 )
 makedepends=(
   'rust' 'cargo' 'git' 'pkgconf' 'wayland-protocols'
-  'libdrm' 'gbm' 'libglvnd' 'seatd' 'systemd'
+  'libdrm' 'seatd' 'systemd'
 )
 provides=('wayland-compositor')
 options=('!lto' '!strip')
-# Dummy source so makepkg's extract step is happy; real build uses $startdir.
-source=("$pkgname-$pkgver.localstub")
-sha256sums=('SKIP')
+# Build from the directory this PKGBUILD lives in - no remote sources.
+source=()
+sha256sums=()
 
 prepare() {
-  # Create the stub the source= line refers to (not a real tarball).
-  : > "$srcdir/$pkgname-$pkgver.localstub"
+  export CARGO_HOME="${CARGO_HOME:-$srcdir/cargo-home}"
 }
 
 build() {
   cd "$startdir"
-  export CARGO_HOME="${CARGO_HOME:-$srcdir/cargo-home}"
   cargo build --release
 }
 
