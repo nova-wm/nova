@@ -116,7 +116,7 @@ Per-window opacity control via window rules.
 
 <p align="center">
   <video controls preload="metadata" width="88%" poster="assets/canvas.png">
-    <source src="https://github.com/nova-wm/nova/raw/refs/heads/main/novawm.mp4" type="video/mp4"/>
+    <source src="https://github.com/nova-wm/nova/releases/download/video/novawm.mp4" type="video/mp4"/>
   </video>
 </p>
 
