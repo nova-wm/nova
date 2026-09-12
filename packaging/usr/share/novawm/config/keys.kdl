@@ -1,0 +1,51 @@
+// NovaWM keybindings (included from config.kdl)
+//
+// bind    <combo> "<action>"
+// bindm   <combo> "<action>"        (mouse drags)
+//
+// combos: mod = the top-level `modifier`, plus optional shift / ctrl / alt / logo
+
+keybinds {
+    bind "mod+Return"    "spawn_terminal"
+    bind "mod+c"         "close_focused"
+    bind "mod+h"         "focus left"
+    bind "mod+l"         "focus right"
+    bind "mod+j"         "focus down"
+    bind "mod+k"         "focus up"
+    bind "mod+shift+h"   "move_list previous"
+    bind "mod+shift+l"   "move_list next"
+    bind "mod+shift+j"   "move_row next"
+    bind "mod+shift+k"   "move_row previous"
+    bind "mod+comma"     "consume_into_column"
+    bind "mod+period"    "expel_from_column"
+    bind "mod+o"         "toggle_overview"
+    bind "mod+shift+r"  "toggle_record"
+    bind "mod+1"         "workspace 1"
+    bind "mod+2"         "workspace 2"
+    bind "mod+3"         "workspace 3"
+    bind "mod+4"         "workspace 4"
+    bind "mod+5"         "workspace 5"
+    bind "mod+6"         "workspace 6"
+    bind "mod+7"         "workspace 7"
+    bind "mod+8"         "workspace 8"
+    bind "mod+9"         "workspace 9"
+    bind "mod+Tab"       "cycle_focus next"
+    bind "mod+shift+Tab" "cycle_focus previous"
+    bind "mod+grave"     "toggle_scratchpad"
+    bind "mod+F1"        "welcome"
+    // App launcher - pick ONE and uncomment (or write your own).
+    // Each runs through sh -c so ~, $VARS, pipes, and flags work.
+    // bind "mod+d" "spawn fuzzel"
+    // bind "mod+d" "spawn wofi --show drun"
+    // bind "mod+d" "spawn rofi -show drun"
+    // bind "mod+d" "spawn qs -c ~/nothing-rice-new/quickshell -i launcher"
+    // Lock screen (needs ext-session-lock; swaylock / hyprlock / qs lock):
+    // bind "mod+l" "spawn swaylock"
+    // bind "mod+l" "spawn hyprlock"
+    // Screenshot convenience:
+    // bind "mod+shift+s" "spawn novactl screenshot area copy"
+    bind "mod+f"         "fullscreen"
+    bind "mod+v"         "toggle_float"
+    bindm "mod+mouse:272" "move_window"
+    bindm "mod+mouse:273" "resize_window"
+}

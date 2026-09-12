@@ -1,0 +1,41 @@
+#!/bin/sh
+# NovaWM session entry for display managers (SDDM, GDM, LightDM, Ly, …).
+set -eu
+
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-NovaWM:wlroots}"
+export XDG_SESSION_TYPE="${XDG_SESSION_TYPE:-wayland}"
+export XDG_SESSION_DESKTOP="${XDG_SESSION_DESKTOP:-NovaWM}"
+
+if [ -z "${XDG_RUNTIME_DIR:-}" ]; then
+  export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+  mkdir -p "$XDG_RUNTIME_DIR"
+  chmod 700 "$XDG_RUNTIME_DIR"
+fi
+
+NOVA_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/novawm"
+if [ ! -d "$NOVA_CONF" ]; then
+  mkdir -p "$NOVA_CONF"
+  if [ -d /usr/share/novawm/config ]; then
+    cp -n /usr/share/novawm/config/* "$NOVA_CONF/" 2>/dev/null || true
+  fi
+fi
+cd "$NOVA_CONF"
+
+[ -f "$NOVA_CONF/environment" ] && . "$NOVA_CONF/environment"
+
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl --user import-environment \
+    DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE \
+    XDG_SESSION_DESKTOP XDG_RUNTIME_DIR XDG_CONFIG_HOME HOME PATH \
+    2>/dev/null || true
+fi
+if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+  dbus-update-activation-environment --systemd --all 2>/dev/null || true
+fi
+
+systemctl --user reset-failed xdg-desktop-portal-wlr.service 2>/dev/null || true
+systemctl --user start pipewire wireplumber pipewire-pulse 2>/dev/null || true
+systemctl --user start xdg-desktop-portal.service 2>/dev/null || true
+systemctl --user start xdg-desktop-portal-wlr.service 2>/dev/null || true
+
+exec /usr/bin/novawm drm "$@"

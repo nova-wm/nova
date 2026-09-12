@@ -1,0 +1,37 @@
+// NovaWM canvas-mode keybindings (included from config.kdl)
+//
+// These only do something when `layout "canvas"` is active:
+//   mod+equal  zoom the canvas in (around the cursor)
+//   mod+minus  zoom the canvas out (around the cursor)
+//   mod+0      reset the canvas view (zoom 1, no pan)
+//   mod+x      center the view on the focused window
+//   mod+w      zoom to fit every window on the screen
+//   mod+shift+arrows   nudge the focused window across the canvas
+//   mod+ctrl+arrows    pan the canvas view
+//   mod+t      pin/unpin the focused window to its screen spot
+//   mod+a      home (reset the canvas view)
+//
+// The canvas basics need no keys at all:
+//   mod+scroll         zoom around the cursor
+//   mod+shift+scroll   switch workspaces
+//   mod+drag on empty space   pan the canvas
+//   mod+drag a window         move it on the canvas
+//   mod+right-drag a window   resize it freely
+
+keybinds {
+    bind "mod+equal" "canvas_zoom_in"
+    bind "mod+minus" "canvas_zoom_out"
+    bind "mod+0"     "canvas_zoom_reset"
+    bind "mod+x"     "canvas_center_window"
+    bind "mod+w"     "canvas_zoom_to_fit"
+    bind "mod+shift+Left"  "canvas_nudge left"
+    bind "mod+shift+Right" "canvas_nudge right"
+    bind "mod+shift+Up"    "canvas_nudge up"
+    bind "mod+shift+Down"  "canvas_nudge down"
+    bind "mod+ctrl+Left"   "canvas_pan left"
+    bind "mod+ctrl+Right"  "canvas_pan right"
+    bind "mod+ctrl+Up"     "canvas_pan up"
+    bind "mod+ctrl+Down"   "canvas_pan down"
+    bind "mod+t"     "toggle_pin"
+    bind "mod+a"     "canvas_home"
+}

@@ -1,0 +1,12 @@
+// NovaWM dwindle-layout settings (included from config.kdl)
+
+dwindle {
+    // Fraction of a new split given to the first window (0.05..0.95).
+    // Applies to splits made after the change; existing splits keep
+    // their ratios (Super+right-drag still adjusts them live).
+    split_ratio 0.5
+    // New-split orientation: "auto" (side-by-side when the leaf is wider
+    // than tall, else stacked), "horizontal" (always side-by-side),
+    // "vertical" (always stacked).
+    split_direction "auto"
+}

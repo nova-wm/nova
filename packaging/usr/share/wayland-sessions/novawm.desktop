@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=NovaWM
+Comment=NovaWM Wayland compositor
+Exec=novawm-session
+TryExec=novawm-session
+Type=Application
+DesktopNames=NovaWM;wlroots
+X-GDM-SessionRegisters=true
+Keywords=tiling;wayland;compositor;

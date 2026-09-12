@@ -1,0 +1,6 @@
+/target
+*.pkg.tar.*
+srcpkg/
+pkg/
+*.log
+.cargo-home/

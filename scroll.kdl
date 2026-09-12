@@ -1,0 +1,5 @@
+// NovaWM scrolling-layout settings (included from config.kdl)
+
+scroll {
+    speed 400
+}

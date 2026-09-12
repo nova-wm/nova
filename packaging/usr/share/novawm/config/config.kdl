@@ -1,0 +1,68 @@
+// NovaWM system defaults - copied to ~/.config/novawm on first login.
+modifier "super"
+layout "scrolling"
+
+include "keys.kdl"
+include "scroll.kdl"
+include "dwindle.kdl"
+include "canvas_keys.kdl"
+
+gaps {
+    inner 12
+    outer 12
+}
+
+animations {
+    enabled #true
+    duration 300
+    bezier 0.25 0.1 0.25 1.0
+    open "scale_up"
+}
+
+focus {
+    follows_mouse #true
+}
+
+decorations {
+    rounding 12
+    border_width 2
+    active_border_color "#ff007f"
+    inactive_border_color "#444444"
+    border_effect "none"
+    border_effect_speed 1.0
+    border_gradient_color "#00d9ff"
+    blur #true
+    opacity 0.95
+    focus_opacity 1.0
+    grain #false
+    grain_intensity 0.05
+}
+
+// background "/usr/share/backgrounds/novawm.png"
+
+startup "foot"
+terminal "foot"
+xcursor-theme "Adwaita"
+xcursor-size 24
+welcome #true
+
+input {
+    focus-follows-mouse
+    keyboard {
+        xkb {
+            layout "us"
+        }
+    }
+    touchpad {
+        tap
+        natural-scroll
+        accel-profile "adaptive"
+        accel-speed 0.0
+        click-method "clickfinger"
+        disable-while-typing
+    }
+    mouse {
+        accel-profile "adaptive"
+        accel-speed 0.0
+    }
+}

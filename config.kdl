@@ -1,0 +1,152 @@
+// NovaWM Configuration
+//
+// Include files are merged after this master file, so their values win.
+// The split keeps related settings together:
+//   keys.kdl        -> keybinds / bindm
+//   scroll.kdl      -> scrolling-layout tuning
+//   dwindle.kdl     -> dwindle-layout tuning
+//   canvas_keys.kdl -> canvas-mode zoom keybinds
+
+modifier "super"
+layout "scrolling"
+
+include "keys.kdl"
+include "scroll.kdl"
+include "dwindle.kdl"
+include "canvas_keys.kdl"
+
+monitor "eDP-1" {
+    position 0 0
+}
+
+monitor "HDMI-A-1" {
+    position 2560 0
+}
+
+monitor "DP-1" {
+    position 4480 0
+}
+
+gaps {
+    inner 20
+    outer 20
+}
+
+animations {
+    enabled #true
+    duration 300
+    bezier 0.25 0.1 0.25 1.0
+    open "scale_up"
+}
+
+focus {
+    follows_mouse #true
+}
+
+decorations {
+    rounding 12
+    border_width 2
+    active_border_color "#ff007f"
+    inactive_border_color "#444444"
+    // Animated border on the focused window: none | breathing | rainbow |
+    // rainbow_solid | gradient | flow | glow | pulse | ember | chase | bg |
+    // bg-N (N = 2..8). rainbow_solid cycles the whole ring through the hue
+    // wheel; chase runs two heads (border + gradient colors) around the ring;
+    // bg/bg-N orbit N dominant wallpaper colors around it. Speed multiplies
+    // the animation rate; the gradient color is the second stop of the
+    // gradient/chase effects.
+    border_effect "none"
+    border_effect_speed 1.0
+    border_gradient_color "#00d9ff"
+    blur #true
+    opacity 0.9
+    focus_opacity 0.9
+    grain #true
+    grain_intensity 0.05
+}
+
+background "/home/frqme/walls/3840x2160-minimal-monochrome-desktop-wallpapers-v0-9orn3xt37xje1.jpg"
+
+// Shell UI (quickshell, swaync, wlogout, ...): NovaWM implements
+// wlr-layer-shell, so panels/bars/widgets work out of the box and tiles
+// avoid their exclusive zones.
+//
+// Each quoted string is ONE shell command (sh -c), so ~, $HOME, flags,
+// and pipes work. Separate apps = separate strings.
+//
+// Typical session stack:
+//   startup "foot" \
+//           "qs -p ~/nothing-rice-new/quickshell" \
+//           "mako" \
+//           "hypridle"
+// Notifications: mako or swaync. Idle: hypridle / swayidle (need
+// ext-idle-notify, which NovaWM provides). Lock from hypridle via
+// `swaylock` / `hyprlock` (need ext-session-lock, which NovaWM provides).
+//   startup "foot" "qs -c ~/nothing-rice-new/quickshell"
+//   startup "swaybg -i ~/walls/bg.png" "mako"
+startup "foot"
+
+// Terminal for mod+Return, the scratchpad (mod+grave), and the
+// no-startup-apps fallback. Any command works, with arguments:
+//   terminal "kitty --single-instance"
+//   terminal "alacritty"
+//   terminal "xterm"
+terminal "foot"
+
+// Mouse cursor theme and its nominal pixel size. If the theme is missing,
+// NovaWM falls back to the system themes ("default", "Adwaita", ...), then
+// to the built-in drawn arrow. Install Bibata to ~/.icons (no root needed)
+// or name any theme from ~/.icons or /usr/share/icons.
+xcursor-theme "Bibata-Modern-Ice"
+xcursor-size 24
+
+// First-run welcome window: a terminal with a tour and the live keybind
+// table. Reopen anytime with mod+F1; set #false to never show it.
+welcome #true
+
+// Keyboard layout, mouse, and touchpad. The xkb keymap applies at startup
+// (restart after editing it); the touchpad/mouse settings re-apply live
+// whenever the config reloads. Alt+Shift toggles us/il.
+
+// Window rules - match by app_id / title (substring, case-insensitive).
+// Actions: float, center, opacity <0..1>, workspace <1-9>.
+// Discover app_id with: novactl list-windows
+// windowrule {
+//     app_id "mpv"
+//     float
+//     opacity 1.0
+// }
+// windowrule {
+//     title "Picture-in-Picture"
+//     float
+//     center
+// }
+// windowrule {
+//     app_id "discord"
+//     workspace 3
+// }
+
+input {
+    focus-follows-mouse
+
+    keyboard {
+        xkb {
+            layout "us,il"
+            options "grp:alt_shift_toggle"
+        }
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+        accel-profile "adaptive"
+        accel-speed 0.2
+        click-method "clickfinger"
+        disable-while-typing
+    }
+
+    mouse {
+        accel-profile "flat"
+        accel-speed 0.2
+    }
+}
