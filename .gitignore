@@ -4,3 +4,5 @@ srcpkg/
 pkg/
 *.log
 .cargo-home/
+/src/cargo-home/
+/.build/

@@ -31,9 +31,9 @@ options=('!lto' '!strip')
 source=()
 sha256sums=()
 
-prepare() {
-  export CARGO_HOME="${CARGO_HOME:-$srcdir/cargo-home}"
-}
+# Keep makepkg's srcdir/pkgdir out of $startdir/src (that's the real source
+# tree - `makepkg -C` would delete it).
+BUILDDIR="$startdir/.build"
 
 build() {
   cd "$startdir"
