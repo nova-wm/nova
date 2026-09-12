@@ -633,15 +633,6 @@ pub(crate) fn spawn_client(state: &Smallvil) {
 
     let applications = state.config_watcher.config.startup_apps.clone();
 
-    if applications.is_empty() {
-        let terminal = state.config_watcher.config.terminal.clone();
-        let mut parts = terminal.split_whitespace();
-        let binary = parts.next().unwrap_or("foot");
-        let args: Vec<String> = parts.map(str::to_string).collect();
-
-        spawn_wayland_client(binary, &args, &state.socket_name);
-    }
-
     for application in applications {
         let cmdline = application.trim();
         if cmdline.is_empty() {
