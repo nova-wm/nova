@@ -22,6 +22,16 @@ pub struct WindowRule {
     pub center: bool,
 }
 
+/// Route layer-shell surfaces (e.g. a bar shell) to specific outputs.
+///
+#[derive(Clone, Debug, Default)]
+pub struct LayerRule {
+    /// Substring of the layer surface namespace, e.g. "quickshell".
+    pub namespace: String,
+    /// Output name the matching surfaces should be placed on, e.g. "HDMI-A-1".
+    pub output: String,
+}
+
 /// One parsed keybinding from the `keybinds` config block.
 #[derive(Clone, Debug)]
 pub struct Keybind {
@@ -185,6 +195,7 @@ pub struct Config {
     pub grain_intensity: f32,
     pub monitor_configs: Vec<MonitorConfig>,
     pub window_rules: Vec<WindowRule>,
+    pub layer_rules: Vec<LayerRule>,
     pub keybindings: Vec<Keybind>,
     /// Merge state (not a config key): set once a file's `keybinds`
     /// block replaces the built-in defaults, so later include files merge
@@ -240,6 +251,7 @@ impl Default for Config {
             grain_intensity: 0.05,
             monitor_configs: vec![],
             window_rules: vec![],
+            layer_rules: vec![],
             keybindings: default_keybindings(),
             keybindings_from_file: false,
         }
@@ -247,6 +259,14 @@ impl Default for Config {
 }
 
 impl Config {
+    pub fn layer_rule_output(&self, namespace: &str) -> Option<&str> {
+        let ns = namespace.to_lowercase();
+        self.layer_rules
+            .iter()
+            .find(|rule| !rule.namespace.is_empty() && ns.contains(&rule.namespace.to_lowercase()))
+            .map(|rule| rule.output.as_str())
+    }
+
     /// Owned XKB parts for `XkbConfig` construction. The keymap is baked
     /// into the keyboard when the seat is created, so editing the `xkb`
     pub fn xkb_parts(&self) -> (String, String, String, String, Option<String>) {
@@ -1227,6 +1247,40 @@ fn apply_document(config: &mut Config, doc: &KdlDocument) {
                 config.window_rules.push(rule);
             }
         }
+
+        for node in doc.nodes() {
+            let name = node.name().value();
+            if name != "layerrule" {
+                continue;
+            }
+            let mut rule = LayerRule::default();
+            if let Some(children) = node.children() {
+                for child in children.nodes() {
+                    let tag = child.name().value();
+                    let val = child
+                        .entries()
+                        .first()
+                        .and_then(|e| e.value().as_string())
+                        .map(|s| s.to_string());
+                    match tag {
+                        "namespace" | "ns" => {
+                            if let Some(v) = val {
+                                rule.namespace = v;
+                            }
+                        }
+                        "output" | "monitor" => {
+                            if let Some(v) = val {
+                                rule.output = v;
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            if !rule.namespace.is_empty() && !rule.output.is_empty() {
+                config.layer_rules.push(rule);
+            }
+        }
     }
 
 fn parse_hex_color(hex: &str) -> Option<[f32; 4]> {
@@ -1323,5 +1377,32 @@ windowrule {
             "later keybinds blocks must not wipe earlier ones"
         );
         assert_eq!(watcher.config.scroll_speed, 400, "scroll settings must load from scroll.kdl");
+    }
+
+    #[test]
+    fn layerrule_parse_and_lookup() {
+        let mut config = Config::default();
+        let doc: kdl::KdlDocument = r#"
+layerrule {
+    namespace "quickshell"
+    output "HDMI-A-1"
+}
+layerrule {
+    ns "mako"
+    monitor "eDP-1"
+}
+"#
+        .parse()
+        .expect("kdl doc must parse");
+        super::apply_document(&mut config, &doc);
+
+        assert_eq!(config.layer_rules.len(), 2);
+        assert_eq!(config.layer_rule_output("quickshell"), Some("HDMI-A-1"));
+        assert_eq!(config.layer_rule_output("org.mako.NotificationDaemon"), Some("eDP-1"));
+        assert_eq!(
+            config.layer_rule_output("other"),
+            None,
+            "unmatched namespaces must fall through"
+        );
     }
 }

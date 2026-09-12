@@ -39,9 +39,12 @@ impl WlrLayerShellHandler for Smallvil {
         _layer: WlrLayer,
         namespace: String,
     ) {
-        let output = output
-            .as_ref()
-            .and_then(Output::from_resource)
+        let output = self
+            .config_watcher
+            .config
+            .layer_rule_output(&namespace)
+            .and_then(|name| self.space.outputs().find(|o| o.name() == name).cloned())
+            .or_else(|| output.as_ref().and_then(Output::from_resource))
             .or_else(|| self.output_under(Some(self.cursor_position)))
             .or_else(|| self.space.outputs().next().cloned());
 

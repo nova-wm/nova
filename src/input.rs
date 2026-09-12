@@ -245,6 +245,10 @@ impl Smallvil {
                                 continue;
                             }
 
+                            if is_canvas_action(&bind.action) && config.layout != "canvas" {
+                                continue;
+                            }
+
                             tracing::debug!(key = ?bind.key, action = ?bind.action, args = ?bind.args, "compositor shortcut");
 
                             if let Some(action) =
@@ -1207,6 +1211,11 @@ fn bind_modifier_bits(modifiers: &[String], configured: &str) -> (bool, bool, bo
     }
 
     bits
+}
+
+/// Canvas-only actions only make sense while the canvas layout is active.
+fn is_canvas_action(action: &str) -> bool {
+    action == "toggle_pin" || action.starts_with("canvas_") || action.starts_with("canvas ")
 }
 
 /// Convert a config action string (plus args) into a keybind action.

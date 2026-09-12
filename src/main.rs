@@ -702,6 +702,10 @@ pub(crate) fn spawn_wayland_client(bin: &str, args: &[String], socket_name: &OsS
         command.env("XDG_RUNTIME_DIR", directory);
     }
 
+    if let Some(home) = std::env::var_os("HOME") {
+        command.current_dir(home);
+    }
+
     match open_appendable(&client_log) {
         Ok(stdout) => match stdout.try_clone() {
             Ok(stderr) => {

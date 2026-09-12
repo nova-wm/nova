@@ -105,7 +105,7 @@ fn main() -> ExitCode {
     let path = match socket_path() {
         Ok(path) => path,
         Err(error) => {
-            eprintln!("novactl: {error} (is NovedWM running with a runtime dir?)");
+            eprintln!("novactl: {error} (is novawm running with a runtime dir?)");
             return ExitCode::FAILURE;
         }
     };
@@ -113,7 +113,11 @@ fn main() -> ExitCode {
     let mut stream = match UnixStream::connect(&path) {
         Ok(stream) => stream,
         Err(error) => {
-            eprintln!("novactl: cannot connect to {}: {error}", path.display());
+            eprintln!(
+                "novactl: cannot connect to {}: {error} (novawm must be running; \
+                 set NOVAWM_IPC_SOCKET to override the path)",
+                path.display(),
+            );
             return ExitCode::FAILURE;
         }
     };
