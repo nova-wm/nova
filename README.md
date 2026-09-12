@@ -112,11 +112,6 @@ Per-window opacity control via window rules.
 </p>
 <br/>
 
-### Showcase
-
-
-<br/>
-
 ---
 
 ## Install
