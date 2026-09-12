@@ -3,6 +3,7 @@
 
 use std::{
     collections::HashMap,
+    hash::Hasher,
     io,
     ops::Deref,
     path::Path,
@@ -90,6 +91,16 @@ const SUPPORTED_FORMATS: &[Fourcc] = &[
 ];
 
 static FRAME_EPOCH: OnceLock<Instant> = OnceLock::new();
+
+/// A commit counter that only reports a change when the payload actually
+/// changes. Used for static border and cursor elements so an idle scene does
+/// not force a full repaint every vsync. Animated effects keep using the
+/// always-bumping `frame_counter` instead.
+fn static_commit(parts: impl std::hash::Hash) -> smithay::backend::renderer::utils::CommitCounter {
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    parts.hash(&mut hasher);
+    (hasher.finish() as usize).into()
+}
 
 type UdevRenderer<'a> = MultiRenderer<
     'a,
@@ -2093,6 +2104,21 @@ impl Smallvil {
                         let ring_radius = (config.rounding as f32 * scale as f32 * zoom)
                             .min(base_rect.size.w.min(base_rect.size.h) as f32 / 2.0)
                             .max(0.0);
+                        let ring_animated =
+                            focused && crate::border::is_animated_border_effect(&config.border_effect);
+                        let ring_cc = if ring_animated {
+                            frame_cc
+                        } else {
+                            static_commit((
+                                outer.loc.x,
+                                outer.loc.y,
+                                outer.size.w,
+                                outer.size.h,
+                                (bw_physical.max(1) as f32).to_bits(),
+                                ring_radius.to_bits(),
+                                color.map(f32::to_bits),
+                            ))
+                        };
                         ring_elements.push(NovaDrmElement::Border(RoundedBorderElement::new(
                             base_id.namespaced(0x4000),
                             border_program.clone(),
@@ -2101,7 +2127,7 @@ impl Smallvil {
                             bw_physical.max(1) as f32,
                             ring_radius,
                             color.into(),
-                            frame_cc,
+                            ring_cc,
                         )));
                     }
                 }
@@ -2212,7 +2238,7 @@ impl Smallvil {
                             id,
                             texture,
                             Rectangle::<i32, Physical>::new((x, y).into(), (width, height).into()),
-                            frame_cc,
+                            static_commit((x, y)),
                             1.0,
                         ),
                     ));
@@ -2221,7 +2247,15 @@ impl Smallvil {
             if elements.is_empty() {
                 elements = drm
                     .cursor_sprite
-                    .elements(cursor_position, output_geometry, &output, frame_cc)
+                    .elements(
+                        cursor_position,
+                        output_geometry,
+                        &output,
+                        static_commit((
+                            cursor_position.x as i64,
+                            cursor_position.y as i64,
+                        )),
+                    )
                     .into_iter()
                     .map(NovaDrmElement::Cursor)
                     .collect();
@@ -2235,6 +2269,8 @@ impl Smallvil {
                         outer.loc.x as f32 + outer.size.w as f32 / 2.0,
                         outer.loc.y as f32 + outer.size.h as f32 / 2.0,
                     );
+                    let solid_animated =
+                        *focused && crate::border::is_animated_border_effect(&config.border_effect);
                     for (index, rect) in ring.into_iter().enumerate() {
                         let mut color = *color;
                         if *focused
@@ -2256,10 +2292,23 @@ impl Smallvil {
                             )
                             .into();
                         }
+                        let rect = rect.to_physical_precise_round(scale);
+                        let solid_cc = if solid_animated {
+                            frame_cc
+                        } else {
+                            let solid_color = color.components();
+                            static_commit((
+                                rect.loc.x,
+                                rect.loc.y,
+                                rect.size.w,
+                                rect.size.h,
+                                solid_color.map(f32::to_bits),
+                            ))
+                        };
                         let elem = smithay::backend::renderer::element::solid::SolidColorRenderElement::new(
                             id.namespaced(index),
-                            rect.to_physical_precise_round(scale),
-                            frame_cc,
+                            rect,
+                            solid_cc,
                             color,
                             smithay::backend::renderer::element::Kind::Unspecified,
                         );
