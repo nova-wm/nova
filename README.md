@@ -18,7 +18,7 @@
 <p align="center">
   <strong>Scroll</strong> · <strong>Dwindle</strong> · <strong>Canvas</strong>
   <br/>
-  <sub>A tiling Wayland compositor built on <a href="https://smithay.org">Smithay</a>, designed for people who want a fast keyboard-driven desktop without the bloat.</sub>
+  <sub>A tiling Wayland compositor built on <a href="https://smithay.github.io/index.html">Smithay</a>, designed for people who want a fast keyboard-driven desktop without the bloat.</sub>
 </p>
 
 <br/>
@@ -27,7 +27,7 @@
   <a href="#install"><img src="https://img.shields.io/badge/🚀-Install-00898A?style=for-the-badge" alt="Install"></a>
   <a href="docs/"><img src="https://img.shields.io/badge/📖-Docs-6c63ff?style=for-the-badge" alt="Docs"></a>
   <a href="#keybinds"><img src="https://img.shields.io/badge/⌨-Keybinds-ff6ec7?style=for-the-badge" alt="Keybinds"></a>
-  <a href="https://github.com/nova-wm/nova/pkgs/novawm"><img src="https://img.shields.io/badge/📦-AUR-1793d1?style=for-the-badge" alt="AUR"></a>
+  <a href="https://aur.archlinux.org/packages?K=novawm"><img src="https://img.shields.io/badge/📦-AUR-1793d1?style=for-the-badge" alt="AUR"></a>
 </p>
 
 <br/>
@@ -119,7 +119,7 @@ Per-window opacity control via window rules.
 ### Arch Linux (recommended)
 
 ```bash
-git clone https://github.com/nova-wm/nova && cd NovaWM
+git clone https://github.com/nova-wm/nova && cd nova
 makepkg -si
 ```
 
@@ -321,7 +321,7 @@ there is no formal contribution guide yet.
 
 Clone and build:
 ```bash
-git clone https://github.com/nova-wm/nova && cd NovaWM
+git clone https://github.com/nova-wm/nova && cd nova
 cargo build --release
 ./target/release/novawm drm     # from a TTY (not SDDM/GDM session)
 ```

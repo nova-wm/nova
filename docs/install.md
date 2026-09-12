@@ -4,7 +4,7 @@
 
 ```bash
 git clone https://github.com/nova-wm/nova
-cd NovaWM
+cd nova
 makepkg -si
 ```
 
