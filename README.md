@@ -110,12 +110,7 @@ Per-window opacity control via window rules.
   <br/>
   <img src="assets/canvas.png" alt="Canvas layout"  width="90%" style="border-radius:8px; box-shadow: 0 4px 24px rgba(0,0,0,0.5);"/>
 </p>
-<br/>
 
-### Showcase
-
-
-<br/>
 
 ---
 
